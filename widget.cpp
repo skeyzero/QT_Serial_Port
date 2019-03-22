@@ -1,7 +1,6 @@
 #include "widget.h"
 
 
-void stringtochar(QString str,char *buf,char len);
 void StringToHex(QString str, QByteArray &senddata);
 
 //串口
@@ -12,7 +11,6 @@ Widget::Widget(QWidget *parent)
 
 	//参数初始化
 	flag_serial_open = 0;
-	Rp = 0;
 	send_type = HEX_TYPE;
 	receive_type = HEX_TYPE;
 
@@ -253,54 +251,12 @@ void Widget::bt_handle()
 
 void Widget::serial_read()
 {
-	int i = 0;
 	QByteArray buf;
-	int buf_size;
 	buf = serial->readAll();//读出的数据未必完整
-	//将数据保存在接收缓冲区
-	buf_size = buf.size();
-	buf.resize(buf_size);
-	for(i=0;i<buf_size;i++)
-	{
-		Receive_Buf[Rp] = static_cast<u8>(buf[i]);
-		Rp ++;
-		Rp %= sizeof (Receive_Buf);
-	}
-	buf.clear();
-
-	u16 loop = 0;
-	static QByteArray rx_buf;
-	static u16 rp = 0;
-	for(loop=0; loop< 1000;loop ++)
-	{
-		if(((rp + sizeof (Receive_Buf) - Rp)%sizeof (Receive_Buf)) != 0)
-		{
-			rx_buf[0] = Receive_Buf[rp];
-			rx_buf.resize(1);
-
-			Disp_Rx_Data(&rx_buf);			//打印接收到的数据
-			rp = (rp + 1)%sizeof (Receive_Buf);
-		}
-		else
-		{
-			break;
-		}
-	}
-}
-
-
-
-/*
-This Function is Used to translate the hex to char and then print by serial port
-*/
-void Widget::Disp_Rx_Data(QByteArray* rx_buf)
-{
-	//    te_serial_read->append("Read:");
-	QDataStream out(rx_buf,QIODevice::ReadWrite);
-	qint8 outChar = 0;
-
 	if(receive_type == HEX_TYPE)
 	{
+		QDataStream out(&buf,QIODevice::ReadWrite);
+		qint8 outChar = 0;
 		while(!out.atEnd())
 		{
 			out>>outChar;   //每字节填充一次，直到结束
@@ -315,19 +271,14 @@ void Widget::Disp_Rx_Data(QByteArray* rx_buf)
 	else
 	{
 		QString str;
-		uint8_t i;
-		for(i=0;i<rx_buf->size();i++)
-		{
-			str.append(rx_buf[i]);
-		}
-
+		str = buf;
 		te_receive_buff->insertPlainText(str);//大写
 		QTextCursor cursor = te_receive_buff->textCursor();
 		cursor.movePosition(QTextCursor::End);
 		te_receive_buff->setTextCursor(cursor);
 	}
-
 }
+
 
 
 
@@ -343,41 +294,6 @@ char ConvertHexChar(char ch)
 	else return ch-ch;//不在0-f范围内的会发送成0
 }
 
-/*将字符串转换为自负*/
-void stringtochar(QString str,char *buf,char len)
-{
-	int i;
-	char str_buf[20];
-	char tx_addr[20];
-	strcpy_s(str_buf,str.toLocal8Bit().data());
-
-	for(i=0;i<len;i++)
-	{
-		if((str_buf[i] >= '0')&&(str_buf[i] <= '9'))
-		{
-			tx_addr[i] = str_buf[i] - '0';
-		}
-		else  if((str_buf[i] >= 'A')&&(str_buf[i] <= 'F'))
-		{
-
-			tx_addr[i] = str_buf[i] - 'A' + 0x0A;
-		}
-		else  if((str_buf[i] >= 'a')&&(str_buf[i] <= 'f'))
-		{
-
-			tx_addr[i] = str_buf[i] - 'a' + 0x0A;
-		}
-		else
-		{
-			tx_addr[i] = 0;
-		}
-	}
-
-	for(i=0;i<(len/2);i++)
-	{
-		*(buf +i) = (tx_addr[i*2] << 4)|tx_addr[(i*2) + 1];
-	}
-}
 
 /*
 将字符串转换为hex格式

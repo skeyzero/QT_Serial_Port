@@ -49,8 +49,6 @@ class Widget : public QWidget
 public:
 
 	u8 flag_serial_open;
-	u8 Receive_Buf[1024];
-	u16 Rp;
 	DATA_TYPE send_type;
 	DATA_TYPE receive_type;
 
@@ -83,7 +81,6 @@ public:
 public slots:
 	void bt_handle(void);
 	void serial_read(void);
-	void Disp_Rx_Data(QByteArray* rx_buf);
 
 public:
 	Widget(QWidget *parent = 0);
