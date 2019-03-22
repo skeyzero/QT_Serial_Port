@@ -41,8 +41,8 @@ Widget::Widget(QWidget *parent)
 
 	//文本编辑初始化
 	te_send_buf = new QTextEdit();
-	te_receive_buff = new QTextEdit();
-
+	//te_receive_buff = new QTextEdit();
+	te_receive_buff = new QPlainTextEdit();
 	te_receive_buff->setBaseSize(500,200);
 	te_send_buf->setBaseSize(500,100);
 
@@ -121,7 +121,8 @@ void Widget::bt_handle()
 				serial->setPortName(cbb_port->currentText());
 				if(serial->open(QIODevice::ReadWrite))
 				{
-					te_receive_buff->append("Open Success \n");
+					te_receive_buff->appendPlainText("Open Success \n");
+					//te_receive_buff->append("Open Success \n");
 					bt_open_port->setText("Close");
 					flag_serial_open = 1;
 
@@ -173,7 +174,8 @@ void Widget::bt_handle()
 				}
 				else
 				{
-					te_receive_buff->append("Open Failed\n");
+					te_receive_buff->appendPlainText("Open Failed\n");
+					//te_receive_buff->append("Open Failed\n");
 				}
 			}
 			else

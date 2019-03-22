@@ -19,6 +19,7 @@
 #include <QMessageBox>
 #include <QPalette>
 #include <QIntValidator>
+#include <QPlainTextEdit>
 
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
@@ -53,7 +54,8 @@ public:
 	DATA_TYPE receive_type;
 
 	//文本编辑
-	QTextEdit*	te_receive_buff;
+	//QTextEdit*	te_receive_buff;
+	QPlainTextEdit* te_receive_buff;
 	QTextEdit*	te_send_buf;
 
 	//按键
