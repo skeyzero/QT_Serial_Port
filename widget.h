@@ -83,6 +83,7 @@ public:
 public slots:
 	void bt_handle(void);
 	void serial_read(void);
+	void Disp_Handle(QByteArray buf);
 
 public:
 	Widget(QWidget *parent = 0);

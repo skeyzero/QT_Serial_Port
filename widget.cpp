@@ -251,34 +251,41 @@ void Widget::bt_handle()
 }
 
 
-void Widget::serial_read()
+
+void Widget::Disp_Handle(QByteArray buf)
 {
-	QByteArray buf;
-	buf = serial->readAll();//读出的数据未必完整
+	char i;
+	char code_hex[] = "0123456789ABCDEF";
+	QString str;
 	if(receive_type == HEX_TYPE)
 	{
-		QDataStream out(&buf,QIODevice::ReadWrite);
-		qint8 outChar = 0;
-		while(!out.atEnd())
+		for(i=0;i<buf.size();i++)
 		{
-			out>>outChar;   //每字节填充一次，直到结束
-			//十六进制的转换
-			QString str = QString("%1").arg(outChar&0xFF,2,16,QLatin1Char('0'));
-			te_receive_buff->moveCursor(QTextCursor::End);
-			te_receive_buff->insertPlainText(str.toUpper());//大写
-			te_receive_buff->moveCursor(QTextCursor::End);
-			te_receive_buff->insertPlainText(" ");//每发送两个字符后添加一个空格
+			str[3*i+0] = code_hex[(buf[i]>>4)&0xf];
+			str[3*i+1] = code_hex[buf[i]&0x0F];
+			str[3*i+2] = ' ';
 		}
+		str.resize(buf.size()*3);
+		te_receive_buff->insertPlainText(str);
+		te_receive_buff->moveCursor(QTextCursor::End);
 	}
 	else
 	{
-		QString str;
 		str = buf;
 		te_receive_buff->insertPlainText(str);//大写
 		QTextCursor cursor = te_receive_buff->textCursor();
 		cursor.movePosition(QTextCursor::End);
 		te_receive_buff->setTextCursor(cursor);
 	}
+
+}
+
+
+void Widget::serial_read()
+{
+	QByteArray buf;
+	buf = serial->readAll();//读出的数据未必完整
+	Disp_Handle(buf);
 }
 
 
