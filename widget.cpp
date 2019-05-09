@@ -254,9 +254,10 @@ void Widget::bt_handle()
 
 void Widget::Disp_Handle(QByteArray buf)
 {
-	char i;
+	int i;
 	char code_hex[] = "0123456789ABCDEF";
 	QString str;
+	str.clear();
 	if(receive_type == HEX_TYPE)
 	{
 		for(i=0;i<buf.size();i++)
@@ -266,6 +267,7 @@ void Widget::Disp_Handle(QByteArray buf)
 			str[3*i+2] = ' ';
 		}
 		str.resize(buf.size()*3);
+		qDebug()<<buf.size()*3<<endl;
 		te_receive_buff->insertPlainText(str);
 		te_receive_buff->moveCursor(QTextCursor::End);
 	}
